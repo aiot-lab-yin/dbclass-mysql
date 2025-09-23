@@ -1,18 +1,62 @@
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$rootDir = Resolve-Path (Join-Path $scriptDir "..")
-Set-Location $rootDir
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Tokyo
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=sampledb
+      - MYSQL_USER=student
+      - MYSQL_PASSWORD=student
 
-Write-Host "⚠️  リセットします。これまでの実行結果（db_data 内のデータ）は削除されます。" -ForegroundColor Yellow
-$ans = Read-Host "本当に初期化しますか？ [y/N]"
-if ($ans -match '^(y|Y|yes|YES)$') {
-  Write-Host "データ削除中: $rootDir\db_data"
-  if (Test-Path (Join-Path $rootDir "db_data")) {
-    Remove-Item -Recurse -Force (Join-Path $rootDir "db_data")
-  }
-  New-Item -ItemType Directory -Force -Path (Join-Path $rootDir "db_data") | Out-Null
-  docker compose down
-  docker compose up -d
-  Write-Host "✅ 初期化完了: 空のデータベースが起動しました（localhost:13306）。" -ForegroundColor Green
-} else {
-  Write-Host "キャンセルしました。データは保持されています。"
-}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+
+    # ✅ healthcheck 追加（引数リストで安全に）
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - --protocol=TCP
+        - -h
+        - 127.0.0.1
+        - -uroot
+        - -proot
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  # -------------------------------------------------------
+  # Adminer（ブラウザからDB操作ができる簡易GUIツール）
+  # - DBeaver がインストールできない／うまく動かない学生向けの代替手段
+  # - ブラウザだけで MySQL の内容を確認・操作できる
+  #
+  # 使い方:
+  #   1) 下の adminer: セクションのコメントを外す
+  #   2) `docker compose up -d` で起動
+  #   3) ブラウザで http://localhost:18080 にアクセス
+  #   4) ログイン画面で以下を入力
+  #        - System: MySQL
+  #        - Server: db   （つながらなければ localhost）
+  #        - Username: student
+  #        - Password: student
+  #        - Database: sampledb
+  #   → SQL実行・テーブル確認・データ追加などが可能
+  # -------------------------------------------------------
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "18080:8080"
+    depends_on:
+      db:
+        condition: service_healthy

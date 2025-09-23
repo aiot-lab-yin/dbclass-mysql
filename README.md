@@ -1,8 +1,8 @@
 # データベース授業用 MySQL スターター（bind mount版）
 
-- **データはこのフォルダ直下の `db_data/` に保存**されます（Docker の named volume ではなく bind mount を使用）。
-- GUI クライアントを使いたい場合は **Adminer** を利用できます（デフォルトはコメントアウト）。
-- ホスト側ポートは **13306**（ローカルの 3306 と衝突しにくい設定）。
+- **データはこのフォルダ直下の `db_data/` に保存**されます（Docker の named volume ではなく bind mount を使用）。  
+- GUI クライアントを使いたい場合は **Adminer** を利用できます（デフォルトはコメントアウト）。  
+- ホスト側ポートは **13306**（ローカルの 3306 と衝突しにくい設定）。  
 
 ---
 
@@ -66,14 +66,15 @@
 ## 起動方法（学生向け）
 
 1. **Docker Desktop** を起動（Linux の場合はサービスが動いていることを確認）  
-2. このフォルダを開き、以下のいずれかを実行：
+2. このフォルダを開き、以下のいずれかを実行：  
    - macOS / Linux:  
      ```bash
      ./scripts/start.sh
      ```
    - Windows (PowerShell):  
+     👉 **必ず「管理者権限」で PowerShell を開いて実行してください**  
      ```powershell
-     .\scripts\start.ps1
+     .¥scripts¥start.ps1
      ```
 3. MySQL に接続（共通設定）：  
    - Host: `localhost`  
@@ -113,30 +114,37 @@ SELECT * FROM students;
 
 ## 停止・再開・リセット
 
-- 停止：
+- 停止：  
   - macOS / Linux:  
     ```bash
     ./scripts/stop.sh
     ```
   - Windows:  
+    👉 **必ず「管理者権限」で PowerShell を開いて実行してください**  
     ```powershell
-    .\scripts\stop.ps1
+    .¥scripts¥stop.ps1
     ```
 
 - 再開：  
-  ```bash
-  ./scripts/start.sh
-  # または .\scripts\start.ps1
-  ```
+  - macOS / Linux:  
+    ```bash
+    ./scripts/start.sh
+    ```
+  - Windows:  
+    👉 **必ず「管理者権限」で PowerShell を開いて実行してください**  
+    ```powershell
+    .¥scripts¥start.ps1
+    ```
 
-- **リセット（完全初期化）**：
+- **リセット（完全初期化）**：  
   - macOS / Linux:  
     ```bash
     ./scripts/reset.sh
     ```
   - Windows:  
+    👉 **必ず「管理者権限」で PowerShell を開いて実行してください**  
     ```powershell
-    .\scripts\reset.ps1
+    .¥scripts¥reset.ps1
     ```
   - 実行前に **確認プロンプト** が表示され、`db_data/` 内のデータが削除されることが明示されます。  
 
@@ -148,7 +156,7 @@ SELECT * FROM students;
 
 - **接続できない / Port が違う場合**：
   ```bash
-  docker ps --format 'table {{.Names}}\t{{.Ports}}\t{{.Status}}'
+  docker ps --format 'table {{.Names}}¥t{{.Ports}}¥t{{.Status}}'
   ```
   `13306->3306` が表示されているか確認。異なる場合は接続設定を合わせる。
 
@@ -158,7 +166,7 @@ SELECT * FROM students;
   ```
   （確認の上、`db_data` を削除して再初期化）
 
-- **Apple Silicon で不安定**：
+- **Apple Silicon で不安定**：  
   - `docker-compose.yml` の `platform: linux/arm64/v8` を有効化。
 
 - **ログを見る**：
