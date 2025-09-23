@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Docker bind mount data
+db_data/
+
+# Logs
+*.log
