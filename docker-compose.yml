@@ -1,6 +1,8 @@
 services:
   db:
-    image: mysql:8.4
+    build:
+      context: .
+      dockerfile: Dockerfile.mysql
     restart: unless-stopped
 
     environment:
