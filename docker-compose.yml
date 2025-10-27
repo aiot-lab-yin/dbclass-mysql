@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: dbclass-mysql-db-1   #容器名固定
     build:
       context: .
       dockerfile: Dockerfile.mysql
