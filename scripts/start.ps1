@@ -41,5 +41,28 @@ New-Item -ItemType Directory -Force -Path (Join-Path $RootDir "db_data") | Out-N
 Write-Host "🚀 MySQL コンテナを起動しています..." -ForegroundColor Cyan
 docker compose up -d
 
+# --- MySQL が正常に起動するまで待機 ---
+Write-Host "⌛ MySQL の起動を待機しています..." -ForegroundColor Yellow
+$maxAttempts = 30
+$attempt = 0
+$healthy = $false
+
+while ($attempt -lt $maxAttempts) {
+    $status = docker inspect --format='{{.State.Health.Status}}' dbclass-mysql-db-1 2>$null
+    if ($status -eq "healthy") {
+        $healthy = $true
+        break
+    }
+    Start-Sleep -Seconds 2
+    $attempt++
+}
+
+if ($healthy) {
+    Write-Host "✅ MySQL が正常に起動しました！" -ForegroundColor Green
+} else {
+    Write-Host "⚠️ MySQL の起動がタイムアウトしました（約60秒経過）。" -ForegroundColor Red
+    Write-Host "   docker ps または docker logs dbclass-mysql-db-1 で状態を確認してください。" -ForegroundColor Yellow
+}
+
 Write-Host "✅ 起動完了: MySQL (ホスト: localhost:13306, DB: sampledb, ユーザー: student)" -ForegroundColor Green
 Write-Host "📂 データディレクトリ: $RootDir\db_data"
